@@ -40,7 +40,7 @@ struct AppetizerDetailsView: View {
                     
                     Spacer()
                     
-                    AddToOrderButton(price: appetizer.price) {
+                    AddToOrderButton(price: appetizer.price,title:"Add to orders") {
                         // TODO: Add to order functionality
                     }
                     
