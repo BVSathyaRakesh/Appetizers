@@ -10,6 +10,8 @@ import SwiftUI
 // MARK: - Main Detail View
 struct AppetizerDetailsView: View {
     
+    @EnvironmentObject var order: Order
+    
     var appetizer: Appetizer
     
     @Binding var isShowingDetail: Bool
@@ -40,9 +42,19 @@ struct AppetizerDetailsView: View {
                     
                     Spacer()
                     
-                    AddToOrderButton(price: appetizer.price) {
-                        // TODO: Add to order functionality
+                    Button {
+                        order.add(appetizer)
+                        isShowingDetail = false
+                    } label: {
+        //                APButton(title: "$\(appetizer.price, specifier: "%.2f") - Add to Order")
+                        Text("$\(appetizer.price, specifier: "%.2f") - Add to Order")
                     }
+                    .modifier(StandardButtonStyle())
+        //            .standardButtonStyle()
+        //            .buttonStyle(.bordered)
+        //            .tint(.brandPrimary)
+        //            .controlSize(.large)
+                    .padding(.bottom, 30)
                     
                 }
                 
