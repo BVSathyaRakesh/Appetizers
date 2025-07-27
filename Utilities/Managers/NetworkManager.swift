@@ -7,8 +7,14 @@
 
 import UIKit
 
+// MARK: - Protocol for Dependency Injection
+protocol NetworkManagerProtocol {
+    func fetchAppetizers() async throws -> [Appetizer]
+    func downloadImages(imageURL urlString: String, completed: @escaping (UIImage?) -> Void)
+}
 
-final class NetworkManager {
+// MARK: - NetworkManager Implementation
+final class NetworkManager: NetworkManagerProtocol {
     
     static let shared = NetworkManager()
     

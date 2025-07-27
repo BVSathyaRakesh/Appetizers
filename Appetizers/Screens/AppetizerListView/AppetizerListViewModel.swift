@@ -16,14 +16,23 @@ import Foundation
     @Published var isShowingDetail = false
     @Published var selectedAppetizer: Appetizer?
     
+    // MARK: - Dependencies
+    private let networkManager: NetworkManagerProtocol
+    
+    // MARK: - Initializer
+    init(networkManager: NetworkManagerProtocol = NetworkManager.shared) {
+        self.networkManager = networkManager
+    }
+    
     // MARK: - Network Methods
     func getAppetizers() {
         isLoading = true
         Task{
             do {
-                appetizers = try await NetworkManager.shared.fetchAppetizers()
+                appetizers = try await networkManager.fetchAppetizers()
                 isLoading = false
             }catch {
+                isLoading = false
                 if let apError = error as? APError {
                     switch apError {
                     case .invalidURL:
