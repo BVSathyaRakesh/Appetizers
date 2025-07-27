@@ -16,7 +16,7 @@ struct AppetizerListCell: View {
             AppetizerRemoteImage(urlString: appetizer.imageURL)
                 .aspectRatio(contentMode: .fit)
                 .frame(width: 120,height: 90)
-                .clipShape(.buttonBorder)
+                .cornerRadius(10)
             
             
             VStack(alignment:.leading,spacing: 5){
