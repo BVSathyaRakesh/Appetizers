@@ -8,7 +8,7 @@
 import Foundation
 
 
-class AppetizerListViewModel: ObservableObject {
+@MainActor final class AppetizerListViewModel: ObservableObject {
     
     @Published var appetizers: [Appetizer] = []
     @Published var alertItem: AlertItem?
@@ -19,14 +19,13 @@ class AppetizerListViewModel: ObservableObject {
     // MARK: - Network Methods
     func getAppetizers() {
         isLoading = true
-        NetworkManager.shared.fetchAppetizers { [self] result in
-            DispatchQueue.main.sync {
+        Task{
+            do {
+                appetizers = try await NetworkManager.shared.fetchAppetizers()
                 isLoading = false
-                switch result {
-                case .success(let appetizers):
-                    self.appetizers = appetizers
-                case .failure(let error):
-                    switch error {
+            }catch {
+                if let apError = error as? APError {
+                    switch apError {
                     case .invalidURL:
                         alertItem = AlertContext.invalidURL
                     case .invalidResponse:
@@ -36,9 +35,11 @@ class AppetizerListViewModel: ObservableObject {
                     case .unableToComplete:
                         alertItem = AlertContext.unableToComplete
                     }
+                } else {
+                    alertItem = AlertContext.invalidResponse
                 }
             }
-         }
+        }
     }
     
     // MARK: - Detail View Methods
