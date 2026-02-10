@@ -10,11 +10,13 @@ import SwiftUI
 @main
 struct AppetizersApp: App {
     
+    @StateObject private var router = Router()
     var order = Order()
     
     var body: some Scene {
         WindowGroup {
             AppetizerTabView()
+                .environmentObject(router)
                 .environmentObject(order)
                 .environmentObject(AppetizerServiceContainer())
         }

@@ -10,6 +10,7 @@ import SwiftUI
 struct AccountView: View {
     
     @StateObject var viewModel = AccountViewModel()
+    @EnvironmentObject var router: Router
     @FocusState private var focusedField: FormTextField?
     
     enum FormTextField {
@@ -17,7 +18,7 @@ struct AccountView: View {
     }
     
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: router.path(for: .account)) {
             Form {
                 Section("Personal Information") {
                     TextField("First Name", text: $viewModel.users.firstName)
@@ -76,4 +77,5 @@ struct AccountView: View {
 
 #Preview {
     AccountView()
+        .environmentObject(Router())
 }

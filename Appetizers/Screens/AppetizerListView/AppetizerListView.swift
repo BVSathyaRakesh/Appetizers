@@ -11,10 +11,11 @@ struct AppetizerListView: View {
     
     @StateObject private var viewModel = AppetizerListViewModel()
     @EnvironmentObject var serviceContainer: AppetizerServiceContainer
+    @EnvironmentObject var router: Router
     
     var body: some View {
         ZStack {
-            NavigationStack {
+            NavigationStack(path: router.path(for: .home)) {
                 List(viewModel.appetizers) { appetizer in
                     AppetizerListCell(appetizer: appetizer)
                        // .listRowSeparator(.hidden)
@@ -55,4 +56,6 @@ struct AppetizerListView: View {
 
 #Preview {
     AppetizerListView()
+        .environmentObject(Router())
+        .environmentObject(AppetizerServiceContainer())
 }

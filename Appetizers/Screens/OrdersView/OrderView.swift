@@ -10,10 +10,11 @@ import SwiftUI
 struct OrderView: View {
     
     @EnvironmentObject var order: Order
+    @EnvironmentObject var router: Router
     
     var body: some View {
         
-        NavigationStack {
+        NavigationStack(path: router.path(for: .order)) {
             ZStack{
                 VStack{
                     List{
@@ -39,5 +40,10 @@ struct OrderView: View {
     }
     
     
+}
+
+    OrderView()
+        .environmentObject(Router())
+        .environmentObject(Order())
 }
 
