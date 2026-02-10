@@ -42,6 +42,7 @@ struct OrderView: View {
     
 }
 
+#Preview {
     OrderView()
         .environmentObject(Router())
         .environmentObject(Order())
