@@ -20,28 +20,21 @@ struct AppetizerDetailsView: View {
         VStack{
             VStack{
                 AppetizerImageComponent(urlString: appetizer.imageURL)
-                
                 VStack{
                     VStack{
                         Text(appetizer.name)
                             .font(.title2)
-                        
                         Text(appetizer.description)
                             .multilineTextAlignment(.center)
                             .font(.body)
                             .padding()
-                        
-                        
                         HStack(spacing:40){
                             NutritionInfoView(title: "Calories", value: appetizer.calories)
                             NutritionInfoView(title: "Carbs", value: appetizer.carbs)
                             NutritionInfoView(title: "Protein", value: appetizer.protein)
                         }
-                        
                     }
-                    
                     Spacer()
-                    
                     Button {
                         order.add(appetizer)
                         isShowingDetail = false
@@ -50,20 +43,22 @@ struct AppetizerDetailsView: View {
                         Text("$\(appetizer.price, specifier: "%.2f") - Add to Order")
                     }
                     .modifier(StandardButtonStyle())
+                    .accessibilityIdentifier("addToOrderButton")
+                    .accessibilityLabel("Add to Order for $\(appetizer.price, specifier: "%.2f")")
+                    .accessibilityHint("Adds this appetizer to your order")
         //            .standardButtonStyle()
         //            .buttonStyle(.bordered)
         //            .tint(.brandPrimary)
         //            .controlSize(.large)
-                    .padding(.bottom, 30)
-                    
+                 .padding(.bottom, 30)
                 }
-                
             }
         }
         .frame(width:300,height: 525)
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 12))
         .shadow(radius:5)
+        .accessibilityIdentifier("appetizerDetailView")
         .overlay (
             XDismissButton {
                 isShowingDetail = false

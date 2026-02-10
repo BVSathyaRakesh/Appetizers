@@ -9,7 +9,8 @@ import SwiftUI
 
 struct AppetizerListView: View {
     
-    @StateObject var viewModel = AppetizerListViewModel()
+    @StateObject private var viewModel = AppetizerListViewModel()
+    @EnvironmentObject var serviceContainer: AppetizerServiceContainer
     
     var body: some View {
         ZStack {
@@ -27,6 +28,8 @@ struct AppetizerListView: View {
                 .listStyle(.plain)
             }
             .task {
+                // Configure the service from environment
+                viewModel.configureService(serviceContainer.service)
                 viewModel.getAppetizers()
             }
             .blur(radius: viewModel.isShowingDetail ? 20 : 0)

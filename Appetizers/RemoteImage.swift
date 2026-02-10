@@ -10,18 +10,27 @@ import SwiftUI
 
 final class ImageLoader: ObservableObject {
     
-    @Published var image: Image?  = nil
+    @Published var image: Image? = nil
+    private let imageDownloader: ImageDownloadProtocol
+    
+    init(imageDownloader: ImageDownloadProtocol = NetworkManager.shared) {
+        self.imageDownloader = imageDownloader
+    }
     
     func load(fromURLString urlString: String) {
-        NetworkManager.shared.downloadImages(imageURL: urlString) { uiImage in
-            guard let uiImage = uiImage else { return }
-            
-            DispatchQueue.main.async {
-                self.image = Image(uiImage: uiImage)
+        Task {
+            do {
+                if let uiImage = try await imageDownloader.downloadImage(from: urlString) {
+                    await MainActor.run {
+                        self.image = Image(uiImage: uiImage)
+                    }
+                }
+            } catch {
+                // Handle error silently - image will remain nil and placeholder will be shown
+                print("Failed to load image from \(urlString): \(error)")
             }
         }
     }
-    
 }
 
 

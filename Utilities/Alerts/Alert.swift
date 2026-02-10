@@ -7,7 +7,11 @@
 
 import SwiftUI
 
-struct AlertItem: Identifiable {
+struct AlertItem: Identifiable,Equatable {
+    static func == (lhs: AlertItem, rhs: AlertItem) -> Bool {
+        lhs.id == rhs.id
+    }
+    
     let id = UUID()
     let title: Text
     let message: Text

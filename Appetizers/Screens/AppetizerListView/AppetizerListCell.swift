@@ -31,19 +31,26 @@ struct AppetizerListCell: View {
                     .frame(width: 120,height: 90)
                     .cornerRadius(8)
             }
+            .accessibilityIdentifier("appetizerImage_\(appetizer.id)")
 
             
             VStack(alignment:.leading,spacing: 5){
                 Text(appetizer.name)
                     .font(.headline)
                     .fontWeight(.semibold)
+                    .accessibilityIdentifier("appetizerName_\(appetizer.id)")
                 
                 Text("$\(appetizer.price,specifier:"%.2f")")
                     .foregroundStyle(.secondary)
                     .fontWeight(.semibold)
+                    .accessibilityIdentifier("appetizerPrice_\(appetizer.id)")
             }
             .padding(.leading)
         }
+        .accessibilityIdentifier("appetizerCell_\(appetizer.id)")
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(appetizer.name), $\(appetizer.price, specifier: "%.2f")")
+        .accessibilityHint("Double tap to view details")
     }
 }
 

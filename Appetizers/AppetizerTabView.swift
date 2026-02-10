@@ -33,4 +33,5 @@ struct AppetizerTabView: View {
 
 #Preview {
     AppetizerTabView()
+        .environmentObject(Order())
 }

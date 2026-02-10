@@ -7,66 +7,70 @@
 
 import UIKit
 
-// MARK: - Protocol for Dependency Injection
-protocol NetworkManagerProtocol {
-    func fetchAppetizers() async throws -> [Appetizer]
-    func downloadImages(imageURL urlString: String, completed: @escaping (UIImage?) -> Void)
+// MARK: - Network Configuration
+struct NetworkConfiguration {
+    let baseURL: String
+    let timeoutInterval: TimeInterval
+    let cachePolicy: URLRequest.CachePolicy
+    
+    static let `default` = NetworkConfiguration(
+        baseURL: "http://localhost:3000/swiftui-fundamentals/",
+        timeoutInterval: 30.0,
+        cachePolicy: .useProtocolCachePolicy
+    )
 }
+
+// MARK: - Protocols for Dependency Injection (ISP Compliant)
+
+/// Protocol for API data fetching operations
+protocol APIClientProtocol {
+    func fetchRequest<T: Decodable>(from endpoint: String, responseType: T.Type) async throws -> T
+}
+
+/// Protocol for image downloading operations  
+protocol ImageDownloadProtocol {
+    func downloadImage(from urlString: String) async throws -> UIImage?
+}
+
+/// Composed protocol for components that need both API and image operations
+protocol NetworkManagerProtocol: APIClientProtocol, ImageDownloadProtocol {}
 
 // MARK: - NetworkManager Implementation
 final class NetworkManager: NetworkManagerProtocol {
     
+    // MARK: - Properties
     static let shared = NetworkManager()
     
-    private let cache = NSCache<NSString, UIImage>()
-    static let baseURL = "http://localhost:3000/swiftui-fundamentals/"
-    private let appetizerURL = baseURL + "appetizers"
+    private let httpClient: HTTPClientProtocol
+    private let jsonDecoder: JSONDecoderServiceProtocol
+    private let imageDownloader: ImageDownloaderProtocol
+    private let urlBuilder: URLBuilderProtocol
     
-    private init() {}
-        
-    func fetchAppetizers()  async throws -> [Appetizer] {
-        
-        guard let url = URL(string: appetizerURL) else {
-            throw APError.invalidURL
-        }
-        
-        let (data,_) = try await URLSession.shared.data(from: url)
-        
-        do {
-            let decoder = JSONDecoder()
-            return try decoder.decode(AppetizerResponse.self, from: data).request
-        } catch{
-            throw APError.invalidData
-        }
+    // MARK: - Initialization
+    init(
+        httpClient: HTTPClientProtocol = HTTPClient(),
+        jsonDecoder: JSONDecoderServiceProtocol = JSONDecoderService(),
+        imageDownloader: ImageDownloaderProtocol = ImageDownloader(),
+        urlBuilder: URLBuilderProtocol = URLBuilder()
+    ) {
+        self.httpClient = httpClient
+        self.jsonDecoder = jsonDecoder
+        self.imageDownloader = imageDownloader
+        self.urlBuilder = urlBuilder
     }
     
+    // MARK: - Public Methods
     
-    func downloadImages(imageURL urlString: String, completed: @escaping (UIImage?) -> Void){
-        
-        let cacheKey = NSString(string: urlString)
-        
-        if let cachedImage = cache.object(forKey: cacheKey) {
-            completed(cachedImage)
-            return
-        }
-        
-        guard let url = URL(string: urlString) else {
-            completed(nil)
-            return
-        }
-        
-        let task = URLSession.shared.dataTask(with: URLRequest(url: url)) { data, response, error in
-            
-            guard let data = data, let image = UIImage(data: data) else {
-                completed(nil)
-                return
-            }
-            
-            self.cache.setObject(image, forKey: cacheKey)
-            completed(image)
-        }
-        task.resume()
+    /// Generic method for fetching any decodable type from API
+    func fetchRequest<T: Decodable>(from endpoint: String, responseType: T.Type) async throws -> T {
+        let url = try urlBuilder.buildURL(from: endpoint)
+        let data = try await httpClient.performRequest(url: url)
+        return try jsonDecoder.decode(responseType, from: data)
+    }
+  
+    
+    func downloadImage(from urlString: String) async throws -> UIImage? {
+        return try await imageDownloader.downloadImage(from: urlString)
     }
 }
-
 

@@ -24,6 +24,9 @@ struct XDismissButton: View {
                     .foregroundStyle(.black)
             }
         }
+        .accessibilityIdentifier("closeButton")
+        .accessibilityLabel("Close")
+        .accessibilityHint("Closes the detail view")
     }
 }
 
